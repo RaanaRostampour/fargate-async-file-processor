@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fargate Async File Processor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    input {
+      margin-top: 10px;
+    }
+
+    pre {
+      background: #f4f4f4;
+      padding: 12px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Fargate Async File Processor</h1>
+
+  <div class="card">
+    <h2>Upload CSV File</h2>
+    <input type="file" id="fileInput" accept=".csv" />
+    <br />
+    <button onclick="uploadFile()">Upload</button>
+  </div>
+
+  <div class="card">
+    <h2>Job Status</h2>
+    <p><strong>Job ID:</strong> <span id="jobId">None</span></p>
+    <button onclick="checkStatus()">Check Status</button>
+    <pre id="statusOutput">No status yet</pre>
+  </div>
+
+  <div class="card">
+    <h2>Result</h2>
+    <button onclick="getResult()">Get Result</button>
+    <button onclick="downloadResult()">Download Result</button>
+    <pre id="resultOutput">No result yet</pre>
+  </div>
+
+  <script>
+    const API_BASE_URL = "http://localhost:8000";
+    let currentJobId = null;
+
+    async function uploadFile() {
+      const fileInput = document.getElementById("fileInput");
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert("Please select a CSV file first.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(`${API_BASE_URL}/upload`, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+      currentJobId = data.job_id;
+
+      document.getElementById("jobId").textContent = currentJobId;
+      document.getElementById("statusOutput").textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function checkStatus() {
+      if (!currentJobId) {
+        alert("Upload a file first.");
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/jobs/${currentJobId}`);
+      const data = await response.json();
+
+      document.getElementById("statusOutput").textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function getResult() {
+      if (!currentJobId) {
+        alert("Upload a file first.");
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/jobs/${currentJobId}/result`);
+      const data = await response.json();
+
+      document.getElementById("resultOutput").textContent = JSON.stringify(data, null, 2);
+    }
+
+    function downloadResult() {
+      if (!currentJobId) {
+        alert("Upload a file first.");
+        return;
+      }
+
+      window.location.href = `${API_BASE_URL}/jobs/${currentJobId}/download`;
+    }
+  </script>
+</body>
+</html>

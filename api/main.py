@@ -1,12 +1,25 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 import shutil
 import uuid
 import json
 
 app = FastAPI(title="Fargate Async File Processor")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 
 STORAGE_DIR = Path("storage")
 UPLOAD_DIR = STORAGE_DIR / "uploads"
@@ -102,8 +115,6 @@ def download_result(job_id: str):
         media_type="application/json"
     )
 
-@app.get("/jobs/{job_id}/download")
-def download_result(job_id: str):
     file_path = STORAGE_DIR / "processed" / f"{job_id}.json"
 
     if not file_path.exists():
