@@ -19,16 +19,17 @@ A simple backend system that processes CSV files asynchronously.
 ```text
 User uploads file
         ↓
-API saves file (storage/uploads)
+API creates processing job
         ↓
-Job is written to queue.jsonl
+Storage backend saves file
         ↓
-Worker reads queue
+Queue backend stores job
+        ↓
+Worker reads queued jobs
         ↓
 Worker converts CSV → JSON
         ↓
-Result saved in storage/processed
-```
+Processed result is saved
 
 ---
 
@@ -40,6 +41,18 @@ This project is a simple example of:
 * building a basic job queue
 * designing async workflows
 
+---
+
+## Current Architecture
+
+The project uses a simple backend abstraction layer.
+
+This makes it possible to switch infrastructure implementations later:
+
+- local storage → AWS S3
+- local queue → AWS SQS
+
+without rewriting the application logic.
 ---
 
 ## API Endpoints

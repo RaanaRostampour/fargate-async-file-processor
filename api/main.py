@@ -2,8 +2,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from config import STORAGE_BACKEND, QUEUE_BACKEND
-from storage_backend.local_storage import save_uploaded_file
-from queue_backend.local_queue import enqueue
+from backend_factory import get_storage_backend, get_queue_backend
 from pathlib import Path
 import uuid
 import json
@@ -20,6 +19,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+storage = get_storage_backend()
+queue = get_queue_backend()
 
 STORAGE_DIR = Path("storage")
 UPLOAD_DIR = STORAGE_DIR / "uploads"
@@ -60,7 +61,7 @@ def upload_file(file: UploadFile = File(...)):
     job_id = str(uuid.uuid4())
     file_path = UPLOAD_DIR / f"{job_id}_{file.filename}"
 
-    save_uploaded_file(file, file_path)
+    storage.save_uploaded_file(file, file_path)
 
     message = {
         "job_id": job_id,
@@ -80,7 +81,7 @@ def upload_file(file: UploadFile = File(...)):
 
     save_jobs(jobs)
 
-    enqueue(message)
+    queue.enqueue(message)
 
     return {
         "job_id": job_id,
