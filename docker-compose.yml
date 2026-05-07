@@ -5,8 +5,15 @@ services:
       - "8000:8000"
     volumes:
       - ./storage:/app/storage
+    environment:
+      STORAGE_BACKEND: local
+      QUEUE_BACKEND: local
+
 
   worker:
     build: ./worker
     volumes:
       - ./storage:/app/storage
+    environment:
+      STORAGE_BACKEND: local
+      QUEUE_BACKEND: local
