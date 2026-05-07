@@ -8,7 +8,8 @@ services:
     environment:
       STORAGE_BACKEND: local
       QUEUE_BACKEND: local
-
+      AWS_REGION: eu-central-1
+      S3_BUCKET: placeholder-bucket
 
   worker:
     build: ./worker
