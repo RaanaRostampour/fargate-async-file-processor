@@ -1,23 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+
+# Runtime
+storage/
+
+# Environment
+.env
+
+# macOS
+.DS_Store
+
 # Terraform
 .terraform/
 *.tfstate
 *.tfstate.*
 crash.log
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
 .terraform.lock.hcl
-
-# Environment
-.env
-
-# Python
-__pycache__/
-*.pyc
-
-# Runtime storage
-storage/
-
-# macOS
-.DS_Store

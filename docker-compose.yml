@@ -10,6 +10,7 @@ services:
       QUEUE_BACKEND: local
       AWS_REGION: eu-central-1
       S3_BUCKET: placeholder-bucket
+      SQS_QUEUE_URL: placeholder-queue-url
 
   worker:
     build: ./worker
@@ -18,3 +19,6 @@ services:
     environment:
       STORAGE_BACKEND: local
       QUEUE_BACKEND: local
+      AWS_REGION: eu-central-1
+      S3_BUCKET: placeholder-bucket
+      SQS_QUEUE_URL: placeholder-queue-url

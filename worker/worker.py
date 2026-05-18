@@ -1,6 +1,5 @@
 from pathlib import Path
-from queue_backend.local_queue import dequeue_jobs
-from storage_backend.local_storage import get_processed_file_path
+from backend_factory import get_storage_backend, get_queue_backend
 import csv
 import json
 import time
@@ -8,6 +7,8 @@ import time
 STORAGE_DIR = Path("storage")
 JOBS_FILE = STORAGE_DIR / "jobs.json"
 
+storage = get_storage_backend()
+queue = get_queue_backend()
 
 def process_csv_to_json(file_path: Path, output_path: Path):
     with file_path.open("r", encoding="utf-8") as csv_file:
@@ -38,14 +39,14 @@ def main():
     print("Worker started...")
 
     while True:
-        jobs = dequeue_jobs()
+        jobs = queue.dequeue_jobs()
 
         for job in jobs:
             file_path = Path(job["file_path"])
             job_id = job["job_id"]
 
             if file_path.exists():
-                output_path = get_processed_file_path(job_id)
+                output_path = storage.get_processed_file_path(job_id)
 
                 process_csv_to_json(file_path, output_path)
 
